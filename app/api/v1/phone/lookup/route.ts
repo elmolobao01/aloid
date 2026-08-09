@@ -52,12 +52,18 @@ export async function POST(req: NextRequest) {
     };
   }
 
+  // Nem todo TelecomProvider possui a camada de risco.
+  // Fazemos o narrowing explicitamente para manter compatibilidade
+  // com o provider de desenvolvimento e providers futuros.
+  const providerRisk =
+    telecom && 'risk' in telecom ? telecom.risk : null;
+
   return NextResponse.json({
     phone,
     telecom,
     reputation: {
-      score: telecom?.risk?.level ?? null,
-      risk: telecom?.risk?.level ?? 'unknown',
+      score: providerRisk?.level ?? null,
+      risk: providerRisk?.level ?? 'unknown',
       reports: 0,
     },
     tier: 'free',
