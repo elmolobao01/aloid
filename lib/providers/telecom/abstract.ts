@@ -32,7 +32,10 @@ export type TelecomLookupResult = {
     total: number | null;
     firstBreachedAt: string | null;
     lastBreachedAt: string | null;
-    domains: string[];
+    domains: Array<{
+      domain: string;
+      breachDate: string | null;
+    }>;
   } | null;
 };
 
@@ -79,7 +82,10 @@ type AbstractPhoneIntelligenceResponse = {
     total_breaches?: number | null;
     date_first_breached?: string | null;
     date_last_breached?: string | null;
-    breached_domains?: string[] | null;
+    breached_domains?: Array<{
+      domain?: string | null;
+      breach_date?: string | null;
+    }> | null;
   };
 };
 
@@ -99,19 +105,33 @@ export class AbstractTelecomProvider {
 
   async lookup(e164: string): Promise<TelecomLookupResult> {
     const url = new URL(this.endpoint);
+
+    // A Phone Intelligence API exige api_key e phone como query params.
+    url.searchParams.set('api_key', this.apiKey);
     url.searchParams.set('phone', e164);
+
+    // Como o ALÔ ID está focado no Brasil, também informamos o país.
+    url.searchParams.set('country', 'BR');
 
     const response = await fetch(url.toString(), {
       method: 'GET',
       headers: {
         Accept: 'application/json',
-        'x-api-key': this.apiKey,
       },
       cache: 'no-store',
     });
 
     if (!response.ok) {
-      throw new Error(`Abstract Phone Intelligence respondeu com HTTP ${response.status}.`);
+      const errorBody = await response.text().catch(() => '');
+      console.error(
+        'Abstract Phone Intelligence error:',
+        response.status,
+        errorBody
+      );
+
+      throw new Error(
+        `Abstract Phone Intelligence respondeu com HTTP ${response.status}.`
+      );
     }
 
     const data = (await response.json()) as AbstractPhoneIntelligenceResponse;
@@ -119,7 +139,7 @@ export class AbstractTelecomProvider {
     return {
       carrierCurrent: data.phone_carrier?.name?.trim() || null,
 
-      // A API testada não informa operadora anterior nem confirmação de portabilidade.
+      // O endpoint atual não documenta operadora anterior/portabilidade.
       carrierOriginal: null,
       ported: null,
 
@@ -170,7 +190,10 @@ export class AbstractTelecomProvider {
             total: data.phone_breaches.total_breaches ?? null,
             firstBreachedAt: data.phone_breaches.date_first_breached ?? null,
             lastBreachedAt: data.phone_breaches.date_last_breached ?? null,
-            domains: data.phone_breaches.breached_domains ?? [],
+            domains: (data.phone_breaches.breached_domains ?? []).map((item) => ({
+              domain: item.domain ?? '',
+              breachDate: item.breach_date ?? null,
+            })),
           }
         : null,
     };
