@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { normalizeBrazilPhone } from '@/lib/phone/normalize';
 import { DevelopmentTelecomProvider } from '@/lib/providers/telecom/provider';
+import { AbstractTelecomProvider } from '@/lib/providers/telecom/abstract';
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
@@ -14,8 +15,6 @@ export async function POST(req: NextRequest) {
 
   const phone = normalizeBrazilPhone(body.phone);
 
-  // O normalizador retorna formatos diferentes para números válidos e inválidos.
-  // A checagem explícita de "e164" permite ao TypeScript estreitar corretamente o tipo.
   if (!phone.valid || !('e164' in phone) || !phone.e164) {
     return NextResponse.json({
       phone,
@@ -28,7 +27,23 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  const telecom = await new DevelopmentTelecomProvider().lookup(phone.e164);
+  let telecom;
+
+  try {
+    telecom = process.env.ABSTRACT_PHONE_API_KEY
+      ? await new AbstractTelecomProvider().lookup(phone.e164)
+      : await new DevelopmentTelecomProvider().lookup(phone.e164);
+  } catch (error) {
+    console.error('Falha ao consultar telecom provider:', error);
+
+    telecom = {
+      carrierCurrent: null,
+      carrierOriginal: null,
+      ported: null,
+      source: 'unavailable',
+      checkedAt: new Date().toISOString(),
+    };
+  }
 
   return NextResponse.json({
     phone,
