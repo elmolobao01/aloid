@@ -3,7 +3,18 @@
 import { FormEvent, useMemo, useState } from 'react';
 
 type LookupResponse = {
-  phone?: { valid?: boolean; e164?: string; national?: string; ddd?: string; state?: string; region?: string; lineType?: string };
+  phone?: {
+    valid?: boolean;
+    e164?: string;
+    national?: string;
+    ddd?: string;
+    state?: string | null;
+    region?: string | null;
+    stateName?: string | null;
+    macroRegion?: string | null;
+    areaReference?: string | null;
+    lineType?: string;
+  };
   telecom?: { carrierCurrent?: string | null; carrierOriginal?: string | null; ported?: boolean | null; source?: string | null; checkedAt?: string | null } | null;
   reputation?: { score?: number | null; risk?: string | null; reports?: number | null };
   tier?: string;
@@ -50,7 +61,7 @@ export default function PhoneLookup(){
           minHeight:64,border:'1px solid rgba(100,145,195,.4)',borderRadius:14,
           display:'flex',alignItems:'center',justifyContent:'center',gap:10,
           background:'rgba(8,24,43,.95)',fontWeight:850,fontSize:18
-        }}><span>🇧🇷</span><span>BR +55</span><span style={{color:'#8297ae'}}>⌄</span></div>
+        }}><span style={{fontSize:12,fontWeight:950,color:'#68baff'}}>BR</span><span>+55</span><span style={{color:'#8297ae'}}>⌄</span></div>
         <div style={{position:'relative'}}>
           <span style={{position:'absolute',left:18,top:'50%',transform:'translateY(-50%)',fontSize:22,color:'#399cff'}}>☎</span>
           <input value={phone} onChange={e=>setPhone(mask(e.target.value))} inputMode="tel"
@@ -88,14 +99,23 @@ export default function PhoneLookup(){
 
       <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(175px,1fr))',gap:12,marginTop:20}}>
         <Card icon="☎" label="TIPO DE LINHA" value={line(result.phone.lineType)} detail={`DDD ${result.phone.ddd||'—'}`} tag={result.phone.lineType==='mobile'?'Móvel':undefined}/>
-        <Card icon="⌖" label="LOCALIZAÇÃO" value={result.phone.region||'Não identificada'} detail={result.phone.state?`UF ${result.phone.state}`:'Brasil'} tag={result.phone.state==='BA'?'Região Nordeste':undefined}/>
+        <Card
+          icon="⌖"
+          label="LOCALIZAÇÃO DO DDD"
+          value={result.phone.stateName || result.phone.region || 'Não identificada'}
+          detail={[
+            result.phone.state ? `UF ${result.phone.state}` : null,
+            result.phone.areaReference ? `Área: ${result.phone.areaReference}` : null,
+          ].filter(Boolean).join(' • ') || 'Área de numeração brasileira'}
+          tag={result.phone.macroRegion ? `Região ${result.phone.macroRegion}` : undefined}
+        />
         <Card icon="◉" label="OPERADORA ATUAL" value={result.telecom?.carrierCurrent||'Aguardando integração'} detail={result.telecom?.carrierCurrent?'Consulta telecom':'Provider telecom ainda não conectado'} tag={!result.telecom?.carrierCurrent?'Em breve':undefined}/>
         <Card icon="⇄" label="PORTABILIDADE" value={result.telecom?.ported===true?'Sim':result.telecom?.ported===false?'Não':'Não verificada'} detail={result.telecom?.carrierOriginal?`Origem: ${result.telecom.carrierOriginal}`:'Sem histórico disponível'} tag={result.telecom?.ported==null?'Em breve':undefined}/>
         <Card icon="◇" label="REPUTAÇÃO ALÔ ID" value={risk(result.reputation?.risk)} detail={`${result.reputation?.reports??0} avaliações`} />
       </div>
 
       <div style={{marginTop:16,padding:'13px 16px',borderRadius:14,border:'1px solid rgba(80,135,190,.2)',background:'rgba(15,42,70,.5)',color:'#9eb1c4',fontSize:13,lineHeight:1.5}}>
-        ℹ &nbsp; A operadora atual, portabilidade e reputação serão enriquecidas à medida que os respectivos providers forem ativados. O ALÔ ID não apresenta informações não verificadas como se fossem dados confirmados.
+        ℹ &nbsp; A localização exibida neste momento é a área de referência do DDD, não a localização atual do aparelho ou do titular. Operadora, portabilidade e localidade confirmada serão enriquecidas quando os providers telecom forem ativados.
       </div>
     </div>}
   </section>
