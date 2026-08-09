@@ -42,6 +42,13 @@ export async function POST(req: NextRequest) {
       ported: null,
       source: 'unavailable',
       checkedAt: new Date().toISOString(),
+      lineType: null,
+      providerLocation: null,
+      lineStatus: null,
+      isVoip: null,
+      registration: null,
+      risk: null,
+      breaches: null,
     };
   }
 
@@ -49,8 +56,8 @@ export async function POST(req: NextRequest) {
     phone,
     telecom,
     reputation: {
-      score: null,
-      risk: 'unknown',
+      score: telecom?.risk?.level ?? null,
+      risk: telecom?.risk?.level ?? 'unknown',
       reports: 0,
     },
     tier: 'free',
