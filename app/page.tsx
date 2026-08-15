@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import PhoneLookup from '@/components/PhoneLookup';
 
 export default function Home() {
@@ -32,10 +33,10 @@ export default function Home() {
 
           <nav style={{display:'flex',alignItems:'center',gap:24,color:'#c5d1df',fontSize:14}}>
             <span>Como funciona</span><span>Privacidade</span><span>Sobre</span>
-            <button style={{
+            <Link href="/entrar" style={{
               border:'1px solid #397fe8',background:'transparent',color:'#58bfff',
-              borderRadius:12,padding:'10px 16px',fontWeight:800
-            }}>Entrar</button>
+              borderRadius:12,padding:'10px 16px',fontWeight:800,textDecoration:'none'
+            }}>Entrar</Link>
           </nav>
         </div>
       </header>
