@@ -40,7 +40,7 @@ type LookupResponse = {
   error?: string;
 };
 
-const digitsOnly=(v:string)=>v.replace(/\\D/g,'').slice(0,11);
+const digitsOnly=(v:string)=>v.replace(/\D/g,'').slice(0,11);
 function mask(v:string){
   const d=digitsOnly(v);
   if(d.length<=2)return d;
