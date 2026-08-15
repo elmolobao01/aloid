@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useMemo, useState } from 'react';
+import ReportPanel from '@/components/ReportPanel';
 
 type LookupResponse = {
   phone?: {
@@ -188,6 +189,12 @@ export default function PhoneLookup(){
       <div style={{marginTop:16,padding:'13px 16px',borderRadius:14,border:'1px solid rgba(80,135,190,.2)',background:'rgba(15,42,70,.5)',color:'#9eb1c4',fontSize:13,lineHeight:1.5}}>
         ℹ &nbsp; O risco técnico vem do provider telecom. A reputação ALÔ ID é separada e será formada pelas avaliações da comunidade. Portabilidade continua não verificada até termos uma fonte específica.
       </div>
+      <ReportPanel
+        phone={result.phone.e164 || `+55${digits}`}
+        onSubmitted={() => {
+          // A próxima consulta já trará a reputação agregada recalculada.
+        }}
+      />
     </div>}
   </section>
 }
