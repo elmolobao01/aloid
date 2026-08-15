@@ -41,9 +41,17 @@ type LookupResponse = {
 };
 
 const digitsOnly=(v:string)=>v.replace(/\D/g,'').slice(0,11);
+const inputDigits=(v:string)=>{
+  let d=v.replace(/\D/g,'');
+  // Aceita também colagem em E.164 (+55...).
+  if(d.length>11 && d.startsWith('55')) d=d.slice(2);
+  return d.slice(0,11);
+};
 function mask(v:string){
   const d=digitsOnly(v);
-  if(d.length<=2)return d;
+  if(!d)return '';
+  if(d.length===1)return `(${d}`;
+  if(d.length===2)return `(${d})`;
   if(d.length<=6)return `(${d.slice(0,2)}) ${d.slice(2)}`;
   if(d.length<=10)return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
   return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
@@ -61,10 +69,14 @@ const communityLabel=(score?:number|null,reports?:number)=>{
 };
 
 export default function PhoneLookup(){
-  const [phone,setPhone]=useState('');
+  // Estado canônico: armazena SOMENTE dígitos. A máscara é apenas visual.
+  // Isso impede que parênteses/hífens já renderizados voltem para o estado
+  // e sejam reaplicados a cada tecla.
+  const [phoneDigits,setPhoneDigits]=useState('');
   const [result,setResult]=useState<LookupResponse|null>(null);
   const [loading,setLoading]=useState(false);
-  const digits=useMemo(()=>digitsOnly(phone),[phone]);
+  const digits=useMemo(()=>digitsOnly(phoneDigits),[phoneDigits]);
+  const phoneDisplay=useMemo(()=>mask(digits),[digits]);
   const ready=digits.length===10||digits.length===11;
 
   async function submit(e:FormEvent){
@@ -100,10 +112,13 @@ export default function PhoneLookup(){
         }}><span style={{fontSize:12,fontWeight:950,color:'#68baff'}}>BR</span><span>+55</span><span style={{color:'#8297ae'}}>⌄</span></div>
         <div style={{position:'relative'}}>
           <span style={{position:'absolute',left:18,top:'50%',transform:'translateY(-50%)',fontSize:22,color:'#399cff'}}>☎</span>
-          <input value={phone} onChange={e=>setPhone(mask(e.target.value))} inputMode="tel"
+          <input value={phoneDisplay} onChange={e=>{
+            setPhoneDigits(inputDigits(e.currentTarget.value));
+            if(result) setResult(null);
+          }} inputMode="numeric" autoComplete="tel-national" maxLength={15}
             placeholder="(DDD) 9XXXX-XXXX" aria-label="Número brasileiro"
             style={{width:'100%',boxSizing:'border-box',minHeight:64,border:'1px solid rgba(100,145,195,.4)',borderRadius:14,background:'rgba(8,24,43,.95)',color:'#fff',padding:'0 48px 0 56px',fontSize:20,fontWeight:800,outline:'none'}}/>
-          {phone && <button type="button" onClick={()=>{setPhone('');setResult(null)}} aria-label="Limpar"
+          {digits && <button type="button" onClick={()=>{setPhoneDigits('');setResult(null)}} aria-label="Limpar"
             style={{position:'absolute',right:16,top:'50%',transform:'translateY(-50%)',border:0,background:'transparent',color:'#8ea4bb',fontSize:21,cursor:'pointer'}}>×</button>}
         </div>
         <button disabled={!ready||loading} style={{
