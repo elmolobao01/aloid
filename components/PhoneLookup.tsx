@@ -15,13 +15,32 @@ type LookupResponse = {
     areaReference?: string | null;
     lineType?: string;
   };
-  telecom?: { carrierCurrent?: string | null; carrierOriginal?: string | null; ported?: boolean | null; source?: string | null; checkedAt?: string | null } | null;
-  reputation?: { score?: number | null; risk?: string | null; reports?: number | null };
+  telecom?: {
+    carrierCurrent?: string | null;
+    carrierOriginal?: string | null;
+    ported?: boolean | null;
+    source?: string | null;
+    checkedAt?: string | null;
+  } | null;
+  technicalRisk?: {
+    level?: string | null;
+    disposable?: boolean | null;
+    abuseDetected?: boolean | null;
+    lineStatus?: string | null;
+    isVoip?: boolean | null;
+  } | null;
+  communityReputation?: {
+    score?: number | null;
+    totalReports?: number;
+    positive?: number;
+    negative?: number;
+    dominantCategory?: string | null;
+  };
   tier?: string;
   error?: string;
 };
 
-const digitsOnly=(v:string)=>v.replace(/\D/g,'').slice(0,11);
+const digitsOnly=(v:string)=>v.replace(/\\D/g,'').slice(0,11);
 function mask(v:string){
   const d=digitsOnly(v);
   if(d.length<=2)return d;
@@ -29,8 +48,17 @@ function mask(v:string){
   if(d.length<=10)return `(${d.slice(0,2)}) ${d.slice(2,6)}-${d.slice(6)}`;
   return `(${d.slice(0,2)}) ${d.slice(2,7)}-${d.slice(7)}`;
 }
-const line=(v?:string)=>v==='mobile'?'Celular':v==='landline'?'Fixo':v||'Não identificado';
-const risk=(v?:string|null)=>!v||v==='unknown'?'Sem classificação':v==='low'?'Baixo risco':v==='medium'?'Risco moderado':v==='high'?'Alto risco':v;
+const line=(v?:string)=>v==='mobile'?'Celular':v==='landline'||v==='fixed_or_other'?'Fixo':v||'Não identificado';
+const risk=(v?:string|null)=>!v||v==='unknown'?'Não classificado':v==='low'?'Baixo risco':v==='medium'?'Atenção':v==='high'?'Alto risco':v;
+const communityLabel=(score?:number|null,reports?:number)=>{
+  const total=reports??0;
+  if(!total)return 'Sem avaliações';
+  if(score==null)return 'Sem classificação';
+  if(score>=75)return 'Boa reputação';
+  if(score>=50)return 'Reputação moderada';
+  if(score>=25)return 'Atenção';
+  return 'Reputação baixa';
+};
 
 export default function PhoneLookup(){
   const [phone,setPhone]=useState('');
@@ -40,13 +68,21 @@ export default function PhoneLookup(){
   const ready=digits.length===10||digits.length===11;
 
   async function submit(e:FormEvent){
-    e.preventDefault(); if(!ready||loading)return;
+    e.preventDefault();
+    if(!ready||loading)return;
     setLoading(true); setResult(null);
     try{
-      const r=await fetch('/api/v1/phone/lookup',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({phone:digits})});
+      const r=await fetch('/api/v1/phone/lookup',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({phone:digits})
+      });
       setResult(await r.json());
-    }catch{setResult({error:'Não foi possível concluir a consulta agora.'});}
-    finally{setLoading(false);}
+    }catch{
+      setResult({error:'Não foi possível concluir a consulta agora.'});
+    }finally{
+      setLoading(false);
+    }
   }
 
   const national=result?.phone?.national ? mask(result.phone.national) : mask(digits);
@@ -109,13 +145,28 @@ export default function PhoneLookup(){
           ].filter(Boolean).join(' • ') || 'Área de numeração brasileira'}
           tag={result.phone.macroRegion ? `Região ${result.phone.macroRegion}` : undefined}
         />
-        <Card icon="◉" label="OPERADORA ATUAL" value={result.telecom?.carrierCurrent||'Aguardando integração'} detail={result.telecom?.carrierCurrent?'Consulta telecom':'Provider telecom ainda não conectado'} tag={!result.telecom?.carrierCurrent?'Em breve':undefined}/>
+        <Card icon="◉" label="OPERADORA ATUAL" value={result.telecom?.carrierCurrent||'Aguardando integração'} detail={result.telecom?.carrierCurrent?'Consulta telecom':'Provider telecom ainda não conectado'} />
         <Card icon="⇄" label="PORTABILIDADE" value={result.telecom?.ported===true?'Sim':result.telecom?.ported===false?'Não':'Não verificada'} detail={result.telecom?.carrierOriginal?`Origem: ${result.telecom.carrierOriginal}`:'Sem histórico disponível'} tag={result.telecom?.ported==null?'Em breve':undefined}/>
-        <Card icon="◇" label="REPUTAÇÃO ALÔ ID" value={risk(result.reputation?.risk)} detail={`${result.reputation?.reports??0} avaliações`} />
+        <Card
+          icon="◇"
+          label="RISCO TÉCNICO"
+          value={risk(result.technicalRisk?.level)}
+          detail={[
+            result.technicalRisk?.lineStatus ? `Linha: ${result.technicalRisk.lineStatus}` : null,
+            result.technicalRisk?.isVoip === true ? 'VoIP' : result.technicalRisk?.isVoip === false ? 'Não VoIP' : null,
+          ].filter(Boolean).join(' • ') || 'Sem sinais técnicos adicionais'}
+        />
+        <Card
+          icon="★"
+          label="REPUTAÇÃO ALÔ ID"
+          value={communityLabel(result.communityReputation?.score,result.communityReputation?.totalReports)}
+          detail={`${result.communityReputation?.totalReports??0} avaliações da comunidade`}
+          tag={result.communityReputation?.dominantCategory ? `Mais citado: ${result.communityReputation.dominantCategory}` : undefined}
+        />
       </div>
 
       <div style={{marginTop:16,padding:'13px 16px',borderRadius:14,border:'1px solid rgba(80,135,190,.2)',background:'rgba(15,42,70,.5)',color:'#9eb1c4',fontSize:13,lineHeight:1.5}}>
-        ℹ &nbsp; A localização exibida neste momento é a área de referência do DDD, não a localização atual do aparelho ou do titular. Operadora, portabilidade e localidade confirmada serão enriquecidas quando os providers telecom forem ativados.
+        ℹ &nbsp; O risco técnico vem do provider telecom. A reputação ALÔ ID é separada e será formada pelas avaliações da comunidade. Portabilidade continua não verificada até termos uma fonte específica.
       </div>
     </div>}
   </section>
