@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from 'react';
 import ReportPanel from '@/components/ReportPanel';
+import { supabase } from '@/lib/supabase/client';
 
 type LookupResponse = {
   phone?: {
@@ -89,9 +90,14 @@ export default function PhoneLookup(){
     if(!ready||loading)return;
     setLoading(true); setResult(null);
     try{
+      const { data: sessionData } = await supabase.auth.getSession();
+      const token = sessionData.session?.access_token;
       const r=await fetch('/api/v1/phone/lookup',{
         method:'POST',
-        headers:{'Content-Type':'application/json'},
+        headers:{
+          'Content-Type':'application/json',
+          ...(token ? { Authorization: `Bearer ${token}` } : {})
+        },
         body:JSON.stringify({phone:digits})
       });
       setResult(await r.json());
