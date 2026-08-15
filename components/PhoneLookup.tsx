@@ -75,8 +75,12 @@ export default function PhoneLookup(){
   const [phoneDigits,setPhoneDigits]=useState('');
   const [result,setResult]=useState<LookupResponse|null>(null);
   const [loading,setLoading]=useState(false);
+  const [phoneFocused,setPhoneFocused]=useState(false);
   const digits=useMemo(()=>digitsOnly(phoneDigits),[phoneDigits]);
-  const phoneDisplay=useMemo(()=>mask(digits),[digits]);
+  // Durante a digitação o input mostra apenas os dígitos canônicos.
+  // A máscara é aplicada somente ao sair do campo, evitando qualquer
+  // interferência do cursor/DOM com caracteres de formatação.
+  const phoneDisplay=useMemo(()=>phoneFocused ? digits : mask(digits),[digits,phoneFocused]);
   const ready=digits.length===10||digits.length===11;
 
   async function submit(e:FormEvent){
@@ -112,8 +116,9 @@ export default function PhoneLookup(){
         }}><span style={{fontSize:12,fontWeight:950,color:'#68baff'}}>BR</span><span>+55</span><span style={{color:'#8297ae'}}>⌄</span></div>
         <div style={{position:'relative'}}>
           <span style={{position:'absolute',left:18,top:'50%',transform:'translateY(-50%)',fontSize:22,color:'#399cff'}}>☎</span>
-          <input value={phoneDisplay} onChange={e=>{
-            setPhoneDigits(inputDigits(e.currentTarget.value));
+          <input value={phoneDisplay} onFocus={()=>setPhoneFocused(true)} onBlur={()=>setPhoneFocused(false)} onChange={e=>{
+            const next=inputDigits(e.currentTarget.value);
+            setPhoneDigits(next);
             if(result) setResult(null);
           }} inputMode="numeric" autoComplete="tel-national" maxLength={15}
             placeholder="(DDD) 9XXXX-XXXX" aria-label="Número brasileiro"
