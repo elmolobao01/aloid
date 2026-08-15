@@ -34,12 +34,14 @@ export default function AuthForm() {
         const { error } = await supabase.auth.signInWithPassword({ email, password });
         if (error) throw error;
         setMessage('Acesso realizado com sucesso.');
+        window.location.href = '/app';
       } else {
         const { data, error } = await supabase.auth.signUp({ email, password });
         if (error) throw error;
 
         if (data.session) {
           setMessage('Conta criada e acesso realizado.');
+          window.location.href = '/app';
         } else {
           setMessage('Conta criada. Verifique seu e-mail para confirmar o cadastro.');
         }
