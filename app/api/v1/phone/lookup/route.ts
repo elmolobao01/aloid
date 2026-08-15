@@ -117,15 +117,28 @@ export async function POST(req: NextRequest) {
       const authSupabase = createAuthenticatedServerClient(token);
       const { data: userData } = await authSupabase.auth.getUser(token);
       if (userData.user) {
-        const { error: historyError } = await authSupabase.rpc('record_authenticated_lookup', {
-          p_e164: phone.e164,
-          p_ddd: phone.ddd ?? null,
-          p_state: phone.state ?? null,
-          p_line_type: phone.lineType ?? null,
-          p_carrier_current: telecom?.carrierCurrent ?? null,
-          p_status: 'success',
-        });
-        if (historyError) console.error('Falha ao registrar histórico:', historyError);
+        const { data: lookupId, error: historyError } = await authSupabase.rpc(
+          'record_authenticated_lookup',
+          {
+            p_e164: phone.e164,
+            p_ddd: phone.ddd ?? null,
+            p_state: phone.state ?? null,
+            p_line_type: phone.lineType ?? null,
+            p_carrier_current: telecom?.carrierCurrent ?? null,
+            p_status: 'success',
+          }
+        );
+
+        if (historyError) {
+          console.error('Falha ao registrar histórico autenticado:', {
+            code: historyError.code,
+            message: historyError.message,
+            details: historyError.details,
+            hint: historyError.hint,
+          });
+        } else {
+          console.info('Consulta autenticada registrada:', lookupId);
+        }
       }
     } catch (historyError) {
       console.error('Falha ao registrar histórico:', historyError);
