@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { normalizeBrazilPhone } from '@/lib/phone/normalize';
 import { DevelopmentTelecomProvider } from '@/lib/providers/telecom/provider';
 import { AbstractTelecomProvider } from '@/lib/providers/telecom/abstract';
-import { createPublicServerClient } from '@/lib/supabase/server';
+import { createAuthenticatedServerClient, createPublicServerClient } from '@/lib/supabase/server';
 
 export async function POST(req: NextRequest) {
   const body = await req.json().catch(() => ({}));
@@ -106,6 +106,30 @@ export async function POST(req: NextRequest) {
     }
   } catch (error) {
     console.error('Falha ao consultar reputação comunitária:', error);
+  }
+
+  // Se houver sessão autenticada, registra esta consulta no histórico do usuário.
+  // Consultas anônimas continuam funcionando normalmente e não geram histórico pessoal.
+  const authorization = req.headers.get('authorization') || '';
+  if (authorization.startsWith('Bearer ')) {
+    const token = authorization.slice('Bearer '.length).trim();
+    try {
+      const authSupabase = createAuthenticatedServerClient(token);
+      const { data: userData } = await authSupabase.auth.getUser(token);
+      if (userData.user) {
+        const { error: historyError } = await authSupabase.rpc('record_authenticated_lookup', {
+          p_e164: phone.e164,
+          p_ddd: phone.ddd ?? null,
+          p_state: phone.state ?? null,
+          p_line_type: phone.lineType ?? null,
+          p_carrier_current: telecom?.carrierCurrent ?? null,
+          p_status: 'success',
+        });
+        if (historyError) console.error('Falha ao registrar histórico:', historyError);
+      }
+    } catch (historyError) {
+      console.error('Falha ao registrar histórico:', historyError);
+    }
   }
 
   return NextResponse.json({
