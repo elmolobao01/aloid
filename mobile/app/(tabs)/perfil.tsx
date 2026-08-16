@@ -70,6 +70,15 @@ export default function ProfileScreen() {
       </View>
 
       <Card>
+        <Text style={styles.cardLabel}>ASSINATURA</Text>
+        <Text style={styles.cardTitle}>Planos e oferta de lançamento</Text>
+        <Text style={styles.subtitle}>
+          Compare Premium, Premium Anual e Família, incluindo franquias de consultas avançadas.
+        </Text>
+        <Link href="/planos" style={styles.loginLink}>VER PLANOS →</Link>
+      </Card>
+
+      <Card>
         <Text style={styles.cardLabel}>SINCRONIZAÇÃO</Text>
         <Text style={styles.cardTitle}>Conta conectada</Text>
         <Text style={styles.subtitle}>
