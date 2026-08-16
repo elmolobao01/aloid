@@ -9,16 +9,19 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.aloid.mobile"
+      "bundleIdentifier": "com.aloid.mobile",
+      "buildNumber": "1"
     },
     "android": {
       "package": "com.aloid.mobile",
       "adaptiveIcon": {
         "backgroundColor": "#04101D"
-      }
+      },
+      "versionCode": 1
     },
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "expo-dev-client"
     ],
     "experiments": {
       "typedRoutes": true
