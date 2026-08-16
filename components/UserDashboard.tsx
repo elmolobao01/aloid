@@ -136,7 +136,7 @@ export default function UserDashboard() {
   }
 
   if(loading){
-    return <div style={{maxWidth:1100,margin:'0 auto',paddingTop:80,color:'#9db2c7'}}>Carregando sua conta...</div>;
+    return <div className="alo-account-loading">Carregando sua conta...</div>;
   }
 
   const profile=summary?.profile;
@@ -144,14 +144,15 @@ export default function UserDashboard() {
   const entitlements=summary?.entitlements ?? {history_limit:20,community_reports:true,advanced_lookup:false,protection:false};
   const plan=(profile?.plan||'free').toLowerCase();
 
-  return <div style={{maxWidth:1100,margin:'0 auto'}}>
-    <header style={{display:'flex',justifyContent:'space-between',gap:16,alignItems:'center',padding:'18px 0 24px'}}>
-      <div>
+  return <div className="alo-account-shell" id="inicio">
+    <header className="alo-account-header">
+      <div className="alo-account-heading">
         <div style={sectionLabel}>CONTA ALÔ ID</div>
-        <h1 style={{margin:'6px 0 4px',fontSize:34}}>Minha área</h1>
-        <div style={{color:'#91a8bf',fontSize:14}}>{profile?.display_name||profile?.email||'Usuário ALÔ ID'}</div>
+        <h1>Minha área</h1>
+        <div className="alo-account-user">{profile?.display_name||profile?.email||'Usuário ALÔ ID'}</div>
       </div>
-      <div style={{display:'flex',gap:10,flexWrap:'wrap'}}>
+
+      <div className="alo-desktop-actions">
         <Link href="/" style={secondaryLink}>Consultar número</Link>
         <button onClick={logout} style={secondaryButton}>Sair</button>
       </div>
@@ -160,25 +161,26 @@ export default function UserDashboard() {
     {error&&<div style={errorBox}>{error}</div>}
     {success&&<div style={successBox}>{success}</div>}
 
-    <section style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(200px,1fr))',gap:14,marginTop:10}}>
+    <section className="alo-metrics-grid" aria-label="Resumo da conta">
       <Card title="Histórico" text="Consultas vinculadas à sua conta." value={String(usage.history_count)} />
       <Card title="Consultas no mês" text="Uso da conta no mês atual." value={String(usage.lookups_this_month)} />
       <Card title="Avaliações" text="Contribuições feitas à reputação comunitária." value={String(usage.reports_total)} />
       <Card title="Plano" text="Recursos atualmente liberados para sua conta." value={plan.toUpperCase()} />
     </section>
 
-    <section style={panel}>
-      <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+    <section className="alo-panel" id="plano">
+      <div className="alo-section-head">
         <div>
           <div style={sectionLabel}>SEU PLANO</div>
-          <div style={{fontSize:24,fontWeight:900,marginTop:7}}>{plan==='premium'?'ALÔ ID Premium':'ALÔ ID Free'}</div>
-          <div style={{color:'#91a8bf',fontSize:13,marginTop:5}}>
+          <div className="alo-section-title">{plan==='premium'?'ALÔ ID Premium':'ALÔ ID Free'}</div>
+          <div className="alo-muted">
             A estrutura de planos já está preparada. A contratação Premium será ativada em uma etapa posterior.
           </div>
         </div>
         <div style={planBadge}>{plan.toUpperCase()}</div>
       </div>
-      <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(190px,1fr))',gap:10,marginTop:18}}>
+
+      <div className="alo-entitlements-grid">
         <Entitlement enabled label={`Histórico ${entitlements.history_limit===null?'ampliado':`até ${entitlements.history_limit} itens`}`} />
         <Entitlement enabled={entitlements.community_reports} label="Avaliações comunitárias" />
         <Entitlement enabled={entitlements.advanced_lookup} label="Consulta avançada" />
@@ -186,22 +188,23 @@ export default function UserDashboard() {
       </div>
     </section>
 
-    <section style={panel}>
-      <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+    <section className="alo-panel" id="historico">
+      <div className="alo-section-head">
         <div>
           <div style={sectionLabel}>HISTÓRICO DE CONSULTAS</div>
-          <div style={{color:'#91a8bf',fontSize:13,marginTop:5}}>As consultas mais recentes realizadas enquanto você estiver conectado.</div>
+          <div className="alo-muted">As consultas mais recentes realizadas enquanto você estiver conectado.</div>
         </div>
         <button onClick={load} style={secondaryButton}>Atualizar</button>
       </div>
+
       {history.length===0 ?
-        <div style={{padding:'28px 0 8px',color:'#9fb2c5'}}>Nenhuma consulta registrada nesta conta. Clique em “Consultar número” e faça a primeira.</div> :
-        <div style={{display:'grid',gap:10,marginTop:18}}>{history.map(item=>{
+        <div className="alo-empty-history">Nenhuma consulta registrada nesta conta. Clique em “Consultar número” e faça a primeira.</div> :
+        <div className="alo-history-list">{history.map(item=>{
           const phone=item.phone_numbers;
-          return <div key={item.id} style={historyRow}>
-            <div>
-              <div style={{fontWeight:900,fontSize:17}}>{formatPhone(phone?.e164)}</div>
-              <div style={{fontSize:12,color:'#7f96ad',marginTop:3}}>{phone?.e164||'—'}</div>
+          return <div key={item.id} className="alo-history-row">
+            <div className="alo-history-phone">
+              <div className="alo-history-phone-main">{formatPhone(phone?.e164)}</div>
+              <div className="alo-history-phone-e164">{phone?.e164||'—'}</div>
             </div>
             <Field label="Tipo" value={lineLabel(phone?.line_type)} bare />
             <Field label="Operadora" value={phone?.carrier_current||'—'} bare />
@@ -211,60 +214,92 @@ export default function UserDashboard() {
       }
     </section>
 
-    <section style={panel}>
-      <div style={{display:'flex',justifyContent:'space-between',gap:12,alignItems:'center',flexWrap:'wrap'}}>
+    <section className="alo-panel alo-protection-panel" id="protecao">
+      <div className="alo-protection-icon">🛡</div>
+      <div>
+        <div style={sectionLabel}>PROTEÇÃO</div>
+        <div className="alo-section-title">Proteção de chamadas</div>
+        <div className="alo-muted">
+          Esta área receberá bloqueio, identificação em tempo real e regras de proteção do aplicativo móvel.
+        </div>
+      </div>
+      <div className="alo-coming-badge">EM BREVE</div>
+    </section>
+
+    <section className="alo-panel alo-profile-panel" id="perfil">
+      <div className="alo-section-head">
         <div style={sectionLabel}>PERFIL</div>
         {!editing&&<button onClick={()=>setEditing(true)} style={secondaryButton}>Editar perfil</button>}
       </div>
 
       {editing ?
-        <form onSubmit={saveProfile} style={{marginTop:14}}>
-          <label style={{display:'block',fontSize:11,color:'#7f96ad',fontWeight:800,marginBottom:7}}>NOME DE EXIBIÇÃO</label>
+        <form onSubmit={saveProfile} className="alo-profile-form">
+          <label className="alo-input-label">NOME DE EXIBIÇÃO</label>
           <input
             value={displayName}
             onChange={e=>setDisplayName(e.target.value.slice(0,80))}
             placeholder="Como deseja ser chamado"
             style={inputStyle}
           />
-          <div style={{display:'flex',gap:10,marginTop:12,flexWrap:'wrap'}}>
+          <div className="alo-profile-actions">
             <button type="submit" disabled={saving} style={primaryButton}>{saving?'SALVANDO...':'SALVAR PERFIL'}</button>
             <button type="button" onClick={()=>{setEditing(false);setDisplayName(profile?.display_name||'');}} style={secondaryButton}>Cancelar</button>
           </div>
         </form> :
-        <div style={{marginTop:12,display:'grid',gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))',gap:12}}>
+        <div className="alo-profile-grid">
           <Field label="E-mail" value={profile?.email||'—'} />
           <Field label="Nome" value={profile?.display_name||'Não informado'} />
           <Field label="Plano" value={plan.toUpperCase()} />
         </div>
       }
     </section>
+
+    <nav className="alo-mobile-nav" aria-label="Navegação principal">
+      <Link href="/" className="alo-mobile-nav-item">
+        <span className="alo-mobile-nav-icon">⌕</span>
+        <span>Consulta</span>
+      </Link>
+      <a href="#historico" className="alo-mobile-nav-item">
+        <span className="alo-mobile-nav-icon">◷</span>
+        <span>Histórico</span>
+      </a>
+      <a href="#protecao" className="alo-mobile-nav-item">
+        <span className="alo-mobile-nav-icon">◇</span>
+        <span>Proteção</span>
+      </a>
+      <a href="#perfil" className="alo-mobile-nav-item">
+        <span className="alo-mobile-nav-icon">○</span>
+        <span>Perfil</span>
+      </a>
+    </nav>
+
+    <button className="alo-mobile-logout" onClick={logout}>Sair da conta</button>
   </div>;
 }
 
 function Card({title,text,value}:{title:string;text:string;value:string}){
-  return <div style={{minHeight:150,padding:18,borderRadius:17,border:'1px solid rgba(62,141,220,.28)',background:'linear-gradient(180deg,rgba(11,34,58,.9),rgba(7,24,42,.88))'}}>
+  return <div className="alo-metric-card">
     <div style={sectionLabel}>{title.toUpperCase()}</div>
-    <div style={{fontSize:22,fontWeight:900,marginTop:10}}>{value}</div>
-    <div style={{fontSize:13,color:'#9fb2c5',marginTop:8,lineHeight:1.45}}>{text}</div>
+    <div className="alo-metric-value">{value}</div>
+    <div className="alo-metric-text">{text}</div>
   </div>;
 }
 
 function Entitlement({enabled,label}:{enabled:boolean;label:string}){
-  return <div style={{padding:13,borderRadius:12,background:'rgba(8,26,45,.75)',border:'1px solid rgba(78,129,178,.22)',display:'flex',gap:9,alignItems:'center'}}>
+  return <div className="alo-entitlement">
     <span style={{fontWeight:900,color:enabled?'#50e5b2':'#70879d'}}>{enabled?'✓':'○'}</span>
     <span style={{fontSize:13,color:enabled?'#cfe7f7':'#748ba1',fontWeight:750}}>{label}</span>
   </div>;
 }
 
 function Field({label,value,bare=false}:{label:string;value:string;bare?:boolean}){
-  return <div style={bare?{}:{padding:14,borderRadius:12,background:'rgba(8,26,45,.75)',border:'1px solid rgba(78,129,178,.22)'}}>
-    <div style={{fontSize:11,color:'#7f96ad',fontWeight:800}}>{label.toUpperCase()}</div>
-    <div style={{marginTop:5,fontSize:15,fontWeight:800}}>{value}</div>
+  return <div className={bare?'alo-field alo-field-bare':'alo-field'}>
+    <div className="alo-field-label">{label.toUpperCase()}</div>
+    <div className="alo-field-value">{value}</div>
   </div>;
 }
 
 const sectionLabel:React.CSSProperties={fontSize:12,fontWeight:900,color:'#55c3ff',letterSpacing:'.06em'};
-const panel:React.CSSProperties={marginTop:18,padding:20,borderRadius:18,border:'1px solid rgba(74,143,210,.3)',background:'rgba(7,25,43,.78)'};
 const secondaryLink:React.CSSProperties={minHeight:42,padding:'0 15px',display:'inline-flex',alignItems:'center',borderRadius:10,border:'1px solid rgba(83,146,210,.4)',color:'#9fd5ff',textDecoration:'none',fontWeight:800};
 const secondaryButton:React.CSSProperties={minHeight:42,padding:'0 15px',borderRadius:10,border:'1px solid rgba(83,146,210,.4)',background:'transparent',color:'#9fd5ff',fontWeight:800,cursor:'pointer'};
 const primaryButton:React.CSSProperties={minHeight:44,padding:'0 18px',border:0,borderRadius:10,color:'#fff',fontWeight:900,cursor:'pointer',background:'linear-gradient(135deg,#20b9ef,#5b50ff)'};
@@ -272,4 +307,3 @@ const inputStyle:React.CSSProperties={width:'100%',maxWidth:520,boxSizing:'borde
 const errorBox:React.CSSProperties={margin:'12px 0',padding:14,borderRadius:12,background:'rgba(127,43,52,.25)',border:'1px solid rgba(220,83,93,.25)',color:'#ffd6da'};
 const successBox:React.CSSProperties={margin:'12px 0',padding:14,borderRadius:12,background:'rgba(29,105,83,.25)',border:'1px solid rgba(67,190,148,.25)',color:'#c9ffea'};
 const planBadge:React.CSSProperties={padding:'9px 14px',borderRadius:999,border:'1px solid rgba(79,174,245,.35)',background:'rgba(35,122,192,.14)',color:'#68c8ff',fontWeight:900,fontSize:12};
-const historyRow:React.CSSProperties={display:'grid',gridTemplateColumns:'minmax(180px,1.4fr) repeat(3,minmax(100px,1fr))',gap:12,alignItems:'center',padding:14,borderRadius:13,background:'rgba(8,26,45,.75)',border:'1px solid rgba(78,129,178,.22)'};
