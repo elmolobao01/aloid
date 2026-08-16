@@ -1,1 +1,118 @@
-:root{color-scheme:dark;font-family:Inter,Arial,sans-serif;background:#06101f;color:#f6f9ff}*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 0,#132c54 0,#071221 42%,#030913 100%);min-height:100vh}.wrap{max-width:980px;margin:auto;padding:48px 22px}.brand{font-size:34px;font-weight:800;letter-spacing:-1px}.brand span{color:#4dd9ff}.hero{padding:80px 0 50px;text-align:center}.hero h1{font-size:clamp(38px,7vw,72px);margin:10px 0}.hero p{color:#aebdd2;font-size:19px}.card{background:#0b1728cc;border:1px solid #1e395c;border-radius:24px;padding:24px;box-shadow:0 20px 70px #0008}.search{display:flex;gap:10px;max-width:680px;margin:30px auto 0}.search input{flex:1;padding:18px;border-radius:14px;border:1px solid #284766;background:#07111f;color:white;font-size:18px}.search button{padding:0 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#25d7ff,#635bff);color:white;font-weight:800;cursor:pointer}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:25px}.mini{padding:20px}.mini b{display:block;margin-bottom:7px}.mini span{color:#9fb0c5}@media(max-width:700px){.search{flex-direction:column}.search button{padding:18px}.grid{grid-template-columns:1fr}}
+:root{color-scheme:dark;font-family:Inter,Arial,sans-serif;background:#06101f;color:#f6f9ff}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:radial-gradient(circle at 50% 0,#132c54 0,#071221 42%,#030913 100%);min-height:100vh}
+.wrap{max-width:980px;margin:auto;padding:48px 22px}
+.brand{font-size:34px;font-weight:800;letter-spacing:-1px}
+.brand span{color:#4dd9ff}
+.hero{padding:80px 0 50px;text-align:center}
+.hero h1{font-size:clamp(38px,7vw,72px);margin:10px 0}
+.hero p{color:#aebdd2;font-size:19px}
+.card{background:#0b1728cc;border:1px solid #1e395c;border-radius:24px;padding:24px;box-shadow:0 20px 70px #0008}
+.search{display:flex;gap:10px;max-width:680px;margin:30px auto 0}
+.search input{flex:1;padding:18px;border-radius:14px;border:1px solid #284766;background:#07111f;color:white;font-size:18px}
+.search button{padding:0 24px;border:0;border-radius:14px;background:linear-gradient(135deg,#25d7ff,#635bff);color:white;font-weight:800;cursor:pointer}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:25px}
+.mini{padding:20px}
+.mini b{display:block;margin-bottom:7px}
+.mini span{color:#9fb0c5}
+
+/* ALÔ ID 0.8 - conta mobile-first */
+.alo-account-page{min-height:100vh;background:radial-gradient(circle at 50% 0%,#0a1d35 0%,#061425 35%,#020b16 100%);color:#fff;padding:24px}
+.alo-account-shell{max-width:1100px;margin:0 auto;padding-bottom:26px}
+.alo-account-loading{max-width:1100px;margin:0 auto;padding-top:80px;color:#9db2c7}
+.alo-account-header{display:flex;justify-content:space-between;gap:16px;align-items:center;padding:18px 0 24px}
+.alo-account-heading h1{margin:6px 0 4px;font-size:34px}
+.alo-account-user{color:#91a8bf;font-size:14px}
+.alo-desktop-actions{display:flex;gap:10px;flex-wrap:wrap}
+.alo-metrics-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-top:10px}
+.alo-metric-card{min-height:150px;padding:18px;border-radius:17px;border:1px solid rgba(62,141,220,.28);background:linear-gradient(180deg,rgba(11,34,58,.9),rgba(7,24,42,.88))}
+.alo-metric-value{font-size:22px;font-weight:900;margin-top:10px}
+.alo-metric-text{font-size:13px;color:#9fb2c5;margin-top:8px;line-height:1.45}
+.alo-panel{margin-top:18px;padding:20px;border-radius:18px;border:1px solid rgba(74,143,210,.3);background:rgba(7,25,43,.78);scroll-margin-top:18px}
+.alo-section-head{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}
+.alo-section-title{font-size:24px;font-weight:900;margin-top:7px}
+.alo-muted{color:#91a8bf;font-size:13px;margin-top:5px;line-height:1.45}
+.alo-entitlements-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.alo-entitlement{padding:13px;border-radius:12px;background:rgba(8,26,45,.75);border:1px solid rgba(78,129,178,.22);display:flex;gap:9px;align-items:center}
+.alo-empty-history{padding:28px 0 8px;color:#9fb2c5}
+.alo-history-list{display:grid;gap:10px;margin-top:18px}
+.alo-history-row{display:grid;grid-template-columns:minmax(180px,1.4fr) repeat(3,minmax(100px,1fr));gap:12px;align-items:center;padding:14px;border-radius:13px;background:rgba(8,26,45,.75);border:1px solid rgba(78,129,178,.22)}
+.alo-history-phone-main{font-weight:900;font-size:17px}
+.alo-history-phone-e164{font-size:12px;color:#7f96ad;margin-top:3px}
+.alo-field{padding:14px;border-radius:12px;background:rgba(8,26,45,.75);border:1px solid rgba(78,129,178,.22)}
+.alo-field-bare{padding:0;border:0;background:transparent}
+.alo-field-label{font-size:11px;color:#7f96ad;font-weight:800}
+.alo-field-value{margin-top:5px;font-size:15px;font-weight:800;overflow-wrap:anywhere}
+.alo-profile-grid{margin-top:12px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.alo-profile-form{margin-top:14px}
+.alo-input-label{display:block;font-size:11px;color:#7f96ad;font-weight:800;margin-bottom:7px}
+.alo-profile-actions{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+.alo-protection-panel{display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center}
+.alo-protection-icon{width:48px;height:48px;border-radius:15px;display:grid;place-items:center;background:rgba(39,129,202,.16);border:1px solid rgba(78,154,219,.28);font-size:23px;color:#55c3ff}
+.alo-coming-badge{padding:8px 12px;border-radius:999px;border:1px solid rgba(91,142,188,.28);color:#7892a8;font-size:11px;font-weight:900}
+.alo-mobile-nav,.alo-mobile-logout{display:none}
+
+@media(max-width:860px){
+  .alo-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .alo-entitlements-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .alo-profile-grid{grid-template-columns:1fr}
+  .alo-history-row{grid-template-columns:minmax(150px,1.3fr) repeat(2,minmax(90px,1fr))}
+  .alo-history-row>.alo-field:last-child{grid-column:2/4}
+}
+
+@media(max-width:700px){
+  .search{flex-direction:column}
+  .search button{padding:18px}
+  .grid{grid-template-columns:1fr}
+
+  body{background:#04101d}
+  .alo-account-page{padding:0 14px 94px;background:radial-gradient(circle at 50% 0%,#0b203b 0%,#061525 38%,#030c17 100%)}
+  .alo-account-shell{max-width:none;padding-bottom:12px}
+  .alo-account-header{position:sticky;top:0;z-index:20;margin:0 -14px;padding:16px 14px 13px;background:rgba(3,13,24,.91);backdrop-filter:blur(14px);border-bottom:1px solid rgba(75,129,181,.14)}
+  .alo-account-heading h1{font-size:25px;margin-top:3px}
+  .alo-account-user{font-size:12px;max-width:230px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .alo-desktop-actions{display:none}
+
+  .alo-metrics-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin-top:14px}
+  .alo-metric-card{min-height:118px;padding:14px;border-radius:15px}
+  .alo-metric-value{font-size:24px;margin-top:8px}
+  .alo-metric-text{font-size:11.5px;line-height:1.35}
+
+  .alo-panel{margin-top:12px;padding:16px;border-radius:16px}
+  .alo-section-title{font-size:20px}
+  .alo-section-head{align-items:flex-start}
+  .alo-entitlements-grid{grid-template-columns:1fr;gap:8px;margin-top:14px}
+  .alo-entitlement{padding:11px 12px}
+
+  .alo-history-list{gap:9px;margin-top:14px}
+  .alo-history-row{grid-template-columns:1fr 1fr;padding:14px;gap:13px}
+  .alo-history-phone{grid-column:1/-1;padding-bottom:10px;border-bottom:1px solid rgba(76,132,182,.17)}
+  .alo-history-phone-main{font-size:19px}
+  .alo-history-row>.alo-field:last-child{grid-column:1/-1}
+  .alo-field-bare{padding:0}
+  .alo-field-label{font-size:10px}
+  .alo-field-value{font-size:14px}
+  .alo-empty-history{padding:22px 0 5px;font-size:13px;line-height:1.45}
+
+  .alo-profile-grid{grid-template-columns:1fr;gap:8px}
+  .alo-profile-actions>*{flex:1}
+  .alo-protection-panel{grid-template-columns:auto 1fr;gap:12px}
+  .alo-coming-badge{grid-column:2;justify-self:start}
+  .alo-protection-icon{width:44px;height:44px}
+
+  .alo-mobile-nav{display:grid;grid-template-columns:repeat(4,1fr);position:fixed;left:10px;right:10px;bottom:10px;z-index:50;min-height:68px;padding:6px;border-radius:20px;background:rgba(5,20,36,.96);border:1px solid rgba(65,135,199,.3);box-shadow:0 18px 50px rgba(0,0,0,.48);backdrop-filter:blur(16px)}
+  .alo-mobile-nav-item{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:#8ca8c0;text-decoration:none;font-size:10px;font-weight:800;border-radius:14px;min-width:0}
+  .alo-mobile-nav-item:active{background:rgba(52,136,203,.18);color:#68c9ff}
+  .alo-mobile-nav-icon{font-size:19px;color:#4fbbff;line-height:1}
+  .alo-mobile-logout{display:block;width:100%;margin:13px 0 3px;min-height:44px;border-radius:12px;border:1px solid rgba(83,146,210,.3);background:transparent;color:#8da9c2;font-weight:800}
+}
+
+@media(max-width:390px){
+  .alo-account-page{padding-left:10px;padding-right:10px}
+  .alo-account-header{margin-left:-10px;margin-right:-10px;padding-left:10px;padding-right:10px}
+  .alo-metrics-grid{gap:7px}
+  .alo-metric-card{padding:12px;min-height:112px}
+  .alo-metric-text{font-size:11px}
+  .alo-panel{padding:14px}
+}
