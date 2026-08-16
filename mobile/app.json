@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "ALÔ ID",
+    "slug": "aloid",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "scheme": "aloid",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.aloid.mobile"
+    },
+    "android": {
+      "package": "com.aloid.mobile",
+      "adaptiveIcon": {
+        "backgroundColor": "#04101D"
+      }
+    },
+    "plugins": [
+      "expo-router"
+    ],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
